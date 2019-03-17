@@ -35,8 +35,13 @@
 		"tsconfig"
 	],
 	"scripts": {
-		"b": "rollup -c",
-		"readme": "readme generate"
+		"b": "rollup -c && npm run postbuild",
+		"readme": "readme generate",
+		"postbuild": "node post-build.js",
+		"prepublish": "npm run readme && npm run b",
+		"publish:patch": "np patch --contents=dist",
+		"publish:minor": "np minor --contents=dist",
+		"publish:major": "np major --contents=dist"
 	},
 	"bin": {
 		"create-web-config": "index.cjs.js"
