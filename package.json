@@ -38,7 +38,7 @@
 		"b": "rollup -c && npm run postbuild",
 		"readme": "readme generate",
 		"postbuild": "node post-build.js",
-		"prepublish": "npm run readme && npm run b",
+		"prepublish": "npm run b",
 		"publish:patch": "np patch --contents=dist",
 		"publish:minor": "np minor --contents=dist",
 		"publish:major": "np major --contents=dist"
