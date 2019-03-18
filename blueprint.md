@@ -1,4 +1,5 @@
 {{ template:title }}
+{{ template:badges }}
 {{ template:description }}
 
 <p align="center">

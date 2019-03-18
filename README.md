@@ -1,5 +1,12 @@
 <h1 align="center">create-web-config</h1>
 <p align="center">
+		<a href="https://npmcharts.com/compare/create-web-config?minimal=true"><img alt="Downloads per month" src="https://img.shields.io/npm/dm/create-web-config.svg" height="20"/></a>
+<a href="https://www.npmjs.com/package/create-web-config"><img alt="NPM Version" src="https://img.shields.io/npm/v/create-web-config.svg" height="20"/></a>
+<a href="https://david-dm.org/andreasbm/create-web-config"><img alt="Dependencies" src="https://img.shields.io/david/andreasbm/create-web-config.svg" height="20"/></a>
+<a href="https://github.com/andreasbm/create-web-config/graphs/contributors"><img alt="Contributors" src="https://img.shields.io/github/contributors/andreasbm/create-web-config.svg" height="20"/></a>
+	</p>
+
+<p align="center">
   <b>A CLI to help you get started building modern web applications.</b></br>
   <sub><sub>
 </p>
