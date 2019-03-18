@@ -67,6 +67,12 @@ You can also install the library locally and use the CLI you can run the followi
 $ npm i create-web-config
 ```
 
+Then you would use the CLI like this.
+
+```
+$ web-config new my-project
+```
+
 
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#contributors)
 

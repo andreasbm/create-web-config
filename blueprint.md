@@ -49,5 +49,11 @@ You can also install the library locally and use the CLI you can run the followi
 $ npm i create-web-config
 ```
 
+Then you would use the CLI like this.
+
+```
+$ web-config new my-project
+```
+
 {{ template:contributors }}
 {{ template:license }}
