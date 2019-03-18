@@ -1,6 +1,10 @@
 {{ template:title }}
 {{ template:description }}
 
+<p align="center">
+	<img src="https://raw.githubusercontent.com/andreasbm/create-web-config/master/example.gif" width="600">
+</p>
+
 ## Usage
 
 To create a new app you run the following command.
