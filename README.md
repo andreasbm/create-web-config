@@ -1,4 +1,11 @@
 <h1 align="center">create-web-config</h1>
+<p align="center">
+  <b>A CLI to help you get started building modern web applications.</b></br>
+  <sub><sub>
+</p>
+
+<br />
+
 
 
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#usage)
@@ -11,7 +18,50 @@ To create a new app you run the following command.
 $ npm init web-config new <dir>
 ```
 
-That's it! This library uses [web-config](https://github.com/andreasbm/web-config).
+This command will create a project from scratch for you with with sweet features as for example SCSS imports, Karma testing, live reloading, coping resources, chunking, treeshaking, Typescript, license extraction, filesize visualizer, JSON import, budgets, build progress, minifying, compression with brotli and gzip and much more.
+
+That's it! Behind the curtains, the library [web-config](https://github.com/andreasbm/web-config) is used.
+
+
+[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#configuration)
+
+## ➤ Configuration
+
+The below table shows how to configure the new command.
+
+```
+Usage: new [options] <dir>
+
+Setup a new project from scratch.
+
+Options:
+  -d, --dry   Runs the command without writing any files.
+  -l, --lit   Adds lit-element and various webapp related libraries to the setup.
+  -h, --help  output usage information
+```
+
+
+[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#example)
+
+## ➤ Example
+
+Below are two examples on how to use the command. The commands will both create a project in a folder called "my-project". The first one will create a simple configuration while the other will configure the project to use [lit-element](https://github.com/Polymer/lit-element).
+
+```
+$ npm init web-config new my-project
+$ npm init web-config new my-project -lit
+```
+
+
+[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#local-installation)
+
+## ➤ Local installation
+
+You can also install the library locally and use the CLI you can run the following command.
+
+```
+$ npm i create-web-config
+```
 
 
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#contributors)

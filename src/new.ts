@@ -1,47 +1,10 @@
-import { exec } from "child_process";
 import { green } from "colors";
-import { existsSync, mkdirpSync, outputFileSync } from "fs-extra";
-import ora from "ora";
+import { existsSync } from "fs-extra";
 import { join, resolve } from "path";
 import prompts from "prompts";
-
-const NPM_ID = `@appnest/web-config`;
-const LIT_HOME_PAGE_FOLDER_NAME = `pages/home`;
-const names = {
-	MAIN_TS: `main.ts`,
-	INDEX_HTML: `index.html`,
-	MAIN_SCSS: `main.scss`,
-	ROLLUP_CONFIG_JS: `rollup.config.js`,
-	TS_LINT_JSON: `tslint.json`,
-	TS_CONFIG_JSON: `tsconfig.json`,
-	KARMA_CONFIG_JS: `karma.conf.js`,
-	PACKAGE_JSON: `package.json`,
-	TYPINGS_D_TS: `typings.d.ts`,
-	BROWSERSLISTRC: `.browserslistrc`,
-	GITIGNORE: `.gitignore`,
-	ASSETS: `assets`,
-	HOME_PAGE_TS: `home-element.ts`,
-	HOME_PAGE_SCSS: `home-element.scss`
-};
-
-interface INewCommandConfig {
-	dist: string;
-	src: string;
-	dir: string;
-	overwrite: boolean;
-	dry: boolean;
-	lit: boolean;
-}
-
-/**
- * Install dependencies.
- * @param deps
- * @param development
- * @param dir
- */
-async function install (deps: string[], {development = false, dir = ""}: Partial<{development: boolean, dir: string}>) {
-	await run(`cd ${resolve(process.cwd(), dir)} && npm i ${deps.join(" ")} ${development ? `-D` : ""}`);
-}
+import { LIT_HOME_PAGE_FOLDER_NAME, names, NPM_ID } from "./constants";
+import { createDirectory, installDependencies, writeFile } from "./helpers";
+import { INewCommandConfig } from "./model";
 
 /**
  * Asks the user for input and returns a configuration object for the command.
@@ -50,7 +13,7 @@ async function install (deps: string[], {development = false, dir = ""}: Partial
  * @param lit
  */
 async function getNewCommandConfig ({dir, dry, lit}: {dir: string, dry: boolean, lit: boolean}): Promise<INewCommandConfig> {
-	const input = await prompts([
+	const input = await prompts<"src" | "dist" | "overwrite">([
 		{
 			type: "text",
 			name: "src",
@@ -63,99 +26,23 @@ async function getNewCommandConfig ({dir, dry, lit}: {dir: string, dry: boolean,
 			message: `What should we call the folder with the transpiled output?`,
 			initial: `dist`
 		},
-		{
+
+		// Ugly cast warning, but the prompts library have some funky race condition bugs going on
+		// if we want to ask for two different rounds of user input in a row.
+		...(existsSync(resolve(process.cwd(), dir)) ? [{
 			type: "confirm",
 			name: "overwrite",
-			message: `Do you want to overwrite existing files?`,
+			message: `The directory "${dir}" already exists. Do you want to overwrite existing files?`,
 			initial: true
-		}
+		}] : [] as any)
+
 	], {
 		onCancel: () => {
 			process.exit(1);
 		}
 	});
 
-	return {...input, dir, dry, lit};
-}
-
-/**
- * Writes a file to the correct path.
- * @param name
- * @param content
- * @param config
- */
-function writeFile (name: string, content: string, config: INewCommandConfig) {
-	const path = join(resolve(process.cwd(), config.dir), name);
-
-	// Check if the file exists and if we should then abort
-	if (!config.overwrite && existsSync(path)) {
-		return;
-	}
-
-	console.log(green(`✔ Creating "${name}"`));
-
-	// Check if the command is dry.
-	if (config.dry) {
-		console.log(content);
-		return;
-	}
-
-	outputFileSync(path, content);
-}
-
-/**
- * Runs a command.
- * @param cmd
- */
-function run (cmd: string): Promise<void> {
-	return new Promise((res, rej) => {
-		exec(cmd, error => {
-			if (error !== null) {
-				return rej(error);
-			}
-
-			res();
-		});
-	});
-}
-
-/**
- * Install dependencies.
- * @param dry
- * @param lit
- * @param dir
- */
-async function installDependencies ({dry, lit, dir}: INewCommandConfig) {
-	const spinner = ora(green(`︎Installing dependencies...`)).start();
-
-	function finish () {
-		spinner.succeed(green(`Finished installing dependencies`));
-	}
-
-	// Check if the command is dry
-	if (dry) {
-		finish();
-		return;
-	}
-
-	// Run the command
-	try {
-		await install(["@appnest/web-config"], {dir, development: true});
-
-		// Install lit related dependencies
-		if (lit) {
-			await install([
-				"@appnest/web-router",
-				"lit-element",
-				"weightless"
-			], {dir});
-		}
-
-		finish();
-
-	} catch (err) {
-		spinner.warn(`Could not install dependencies: ${err.message}`);
-	}
+	return {overwrite: true, ...input, dir, dry, lit};
 }
 
 /**
@@ -304,7 +191,8 @@ function setupScripts (config: INewCommandConfig) {
 		"b:prod": "rollup -c --environment NODE_ENV:prod",
 		"s:dev": "rollup -c --watch --environment NODE_ENV:dev",
 		"s:prod": "rollup -c --watch --environment NODE_ENV:prod",
-		"s": "npm run s:dev"
+		"s": "npm run s:dev",
+		"test": "karma start karma.conf.js"
 	}
 }`;
 
@@ -416,6 +304,7 @@ ehthumbs.db
  * Setup base files.
  */
 function setupBaseFiles (config: INewCommandConfig) {
+	const {dir, lit, src} = config;
 
 	// SASS
 	const mainScssContent = `html { font-size: 14px; }`;
@@ -426,21 +315,21 @@ function setupBaseFiles (config: INewCommandConfig) {
 <head>
 	<base href="/">
 	<meta charset="UTF-8">
-	<title>@appnest/web-config</title>
+	<title>${dir}</title>
 </head>
 <body>
-	<p>Hello World!</p>
-	${config.lit ? `<router-slot></router-slot>` : ""}
+	<p>${dir}</p>
+	${lit ? `<router-slot></router-slot>` : ""}
 </body>
 </html>`;
 
-	mkdirpSync(join(resolve(process.cwd(), config.dir), join(config.src, names.ASSETS)));
-	writeFile(join(config.src, names.MAIN_SCSS), mainScssContent, config);
-	writeFile(join(config.src, names.INDEX_HTML), indexContent, config);
+	createDirectory(join(config.dir, src, names.ASSETS), config);
+	writeFile(join(src, names.MAIN_SCSS), mainScssContent, config);
+	writeFile(join(src, names.INDEX_HTML), indexContent, config);
 
 	// Write the lit specific files or the default ones
-	if (config.lit) {
-		const mainContent = `import "main.scss";
+	if (lit) {
+		const mainTsContent = `import "main.scss";
 import "@appnest/web-router";
 import {RouterSlot} from "@appnest/web-router";
 
@@ -458,7 +347,7 @@ customElements.whenDefined("router-slot").then(async () => {
 	]);
 });`;
 
-		const homePageTsContent = `import { customElement, html, LitElement, unsafeCSS } from "lit-element";
+		const homeElementTsContent = `import { customElement, html, LitElement, unsafeCSS } from "lit-element";
 import css from "./home-element.scss";
 import "weightless/button";
 
@@ -479,17 +368,43 @@ declare global {
 	}
 }`;
 
-		const homePageScssContent = `:host {
+		const homeElementScssContent = `:host {
 	color: red;
 }`;
 
-		writeFile(join(config.src, names.MAIN_TS), mainContent, config);
-		writeFile(join(config.src, LIT_HOME_PAGE_FOLDER_NAME, names.HOME_PAGE_TS), homePageTsContent, config);
-		writeFile(join(config.src, LIT_HOME_PAGE_FOLDER_NAME, names.HOME_PAGE_SCSS), homePageScssContent, config);
+		const homeElementTsTestContent = `import "./home-element";
+import HomeElement from "./home-element";
+
+describe("home-element", () => {
+	let {expect} = chai;
+	let $elem: HomeElement;
+	let $container: HTMLElement;
+
+	before(() => {
+		$container = document.createElement("div");
+		document.body.appendChild($container);
+	});
+	beforeEach(async () => {
+		$container.innerHTML = \`<home-element></home-element>\`;
+
+		await window.customElements.whenDefined("home-element");
+		$elem = $container.querySelector<HomeElement>("home-element")!;
+	});
+	after(() => $container.remove());
+
+	it("should be able to be stamped into the DOM", () => {
+		expect($elem).to.exist;
+	});
+});`;
+
+		writeFile(join(src, names.MAIN_TS), mainTsContent, config);
+		writeFile(join(src, LIT_HOME_PAGE_FOLDER_NAME, names.HOME_ELEMENT_TS), homeElementTsContent, config);
+		writeFile(join(src, LIT_HOME_PAGE_FOLDER_NAME, names.HOME_ELEMENT_SCSS), homeElementScssContent, config);
+		writeFile(join(src, LIT_HOME_PAGE_FOLDER_NAME, names.HOME_ELEMENT_TEST_TS), homeElementTsTestContent, config);
 
 	} else {
-		const mainContent = `import "main.scss";`;
-		writeFile(join(config.src, names.MAIN_TS), mainContent, config);
+		const mainTsContent = `import "main.scss";`;
+		writeFile(join(src, names.MAIN_TS), mainTsContent, config);
 	}
 }
 

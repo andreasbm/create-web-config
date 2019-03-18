@@ -44,7 +44,8 @@
 		"publish:major": "np major --contents=dist"
 	},
 	"bin": {
-		"create-web-config": "index.cjs.js"
+		"create-web-config": "index.cjs.js",
+		"web-config": "index.cjs.js"
 	},
 	"dependencies": {
 		"colors": "^1.3.3",
