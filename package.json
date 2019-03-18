@@ -1,6 +1,6 @@
 {
 	"name": "create-web-config",
-	"version": "0.0.5",
+	"version": "1.0.0",
 	"description": "A CLI to help you get started building modern web applications.",
 	"author": "Andreas Mehlsen",
 	"main": "index.cjs.js",
