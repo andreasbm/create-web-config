@@ -108,7 +108,7 @@ function run (cmd: string): Promise<void> {
  * @param config
  */
 async function installDependencies (config: INewCommandConfig) {
-	const spinner = ora(green(`⚙︎Installing dependencies...`)).start();
+	const spinner = ora(green(`︎Installing dependencies...`)).start();
 
 	function finish () {
 		spinner.succeed(green(`Finished installing dependencies`));
