@@ -3,6 +3,7 @@ import { existsSync, mkdirpSync, outputFileSync } from "fs-extra";
 import { join, resolve } from "path";
 import prompts from "prompts";
 import {red, green} from "colors";
+import ora from "ora";
 
 const NPM_ID = `@appnest/web-config`;
 const names = {
@@ -32,31 +33,25 @@ interface INewCommandConfig {
  * Asks the user for input and returns a configuration object for the command.
  * @param dir
  */
-async function getNewCommandConfig ({dir}: {dir: string}): Promise<INewCommandConfig> {
+async function getNewCommandConfig ({dir, dry}: {dir: string, dry: boolean}): Promise<INewCommandConfig> {
 	const input = await prompts([
 		{
 			type: "text",
-			name: "dist",
-			message: `Where's the dist folder located?`,
-			initial: `dist`
+			name: "src",
+			message: `What should we call the folder with your source code?`,
+			initial: `src`
 		},
 		{
 			type: "text",
-			name: "src",
-			message: `Where's the src folder located?`,
-			initial: `src`
+			name: "dist",
+			message: `What should we call the folder with the transpiled output?`,
+			initial: `dist`
 		},
 		{
 			type: "confirm",
 			name: "overwrite",
 			message: `Do you want to overwrite existing files?`,
 			initial: true
-		},
-		{
-			type: "confirm",
-			name: "dry",
-			message: `Do you want a dry run?`,
-			initial: false
 		}
 	], {
 		onCancel: () => {
@@ -64,7 +59,7 @@ async function getNewCommandConfig ({dir}: {dir: string}): Promise<INewCommandCo
 		}
 	});
 
-	return {...input, dir};
+	return {...input, dir, dry};
 }
 
 /**
@@ -81,7 +76,7 @@ function writeFile (name: string, content: string, config: INewCommandConfig) {
 		return;
 	}
 
-	console.log(green(`Creating "${name}"`));
+	console.log(green(`✔ Creating "${name}"`));
 
 	// Check if the command is dry.
 	if (config.dry) {
@@ -113,18 +108,25 @@ function run (cmd: string): Promise<void> {
  * @param config
  */
 async function installDependencies (config: INewCommandConfig) {
-	console.log(green(`Installing dependencies...`));
+	const spinner = ora(green(`⚙︎Installing dependencies...`)).start();
+
+	function finish () {
+		spinner.succeed(green(`Finished installing dependencies`));
+	}
 
 	// Check if the command is dry
 	if (config.dry) {
+		finish();
 		return;
 	}
 
 	// Run the command
 	try {
 		await run(`cd ${resolve(process.cwd(), config.dir)} && npm i @appnest/web-config -D`);
+		finish();
+
 	} catch (err) {
-		console.log(red(`Could not install dependencies: ${err.message}`));
+		spinner.warn(`Could not install dependencies: ${err.message}`)
 	}
 }
 
@@ -266,7 +268,9 @@ module.exports = (config) => {
  * @param config
  */
 function setupScripts (config: INewCommandConfig) {
+	const {dir} = config;
 	const content = `{
+	${dir != "" ? `"name": "${dir}",` : ""}
 	"scripts": {
 		"b:dev": "rollup -c --environment NODE_ENV:dev",
 		"b:prod": "rollup -c --environment NODE_ENV:prod",
@@ -407,10 +411,10 @@ document.addEventListener("click", () => alert("Hello World!"));`;
 
 /**
  * Executes the new command.
- * @param dir
+ * @param options
  */
-export async function newCommand ({dir}: {dir: string}) {
-	const config = await getNewCommandConfig({dir});
+export async function newCommand (options: {dir: string, dry: boolean}) {
+	const config = await getNewCommandConfig(options);
 	setupRollup(config);
 	setupTslint(config);
 	setupTsconfig(config);
@@ -421,5 +425,9 @@ export async function newCommand ({dir}: {dir: string}) {
 	setupGitIgnore(config);
 	setupBaseFiles(config);
 	await installDependencies(config);
-	console.log(green(`Finished creating project in "${resolve(process.cwd(), dir)}"`));
+	console.log(green(`✔ Finished creating project in "${resolve(process.cwd(), options.dir)}" 🎉`));
+	console.log(`What's next?
+  → Run "${green("npm run s")}" to serve your project.
+  → Run "${green("npm run b:dev")}" to build your project for development.
+  → RUn "${green("npm run b:prod")}" to build your project for production.`)
 }

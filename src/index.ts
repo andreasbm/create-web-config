@@ -8,8 +8,9 @@ program
 program
 	.command("new <dir>")
 	.description("Setup a new project from scratch.")
-	.action(dir => {
-		newCommand({dir}).then();
+	.option(`-d, --dry`, `Runs the command without writing any files.`)
+	.action((dir, cmd) => {
+		newCommand({dir, dry: cmd.dry}).then();
 	});
 
 // Do some error handling

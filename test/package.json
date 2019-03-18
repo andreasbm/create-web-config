@@ -1,0 +1,13 @@
+{
+	"name": "test",
+	"scripts": {
+		"b:dev": "rollup -c --environment NODE_ENV:dev",
+		"b:prod": "rollup -c --environment NODE_ENV:prod",
+		"s:dev": "rollup -c --watch --environment NODE_ENV:dev",
+		"s:prod": "rollup -c --watch --environment NODE_ENV:prod",
+		"s": "npm run s:dev"
+	},
+	"devDependencies": {
+		"@appnest/web-config": "^0.4.1"
+	}
+}
