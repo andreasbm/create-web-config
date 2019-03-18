@@ -1,11 +1,12 @@
 import { exec } from "child_process";
+import { green } from "colors";
 import { existsSync, mkdirpSync, outputFileSync } from "fs-extra";
+import ora from "ora";
 import { join, resolve } from "path";
 import prompts from "prompts";
-import {red, green} from "colors";
-import ora from "ora";
 
 const NPM_ID = `@appnest/web-config`;
+const LIT_HOME_PAGE_FOLDER_NAME = `pages/home`;
 const names = {
 	MAIN_TS: `main.ts`,
 	INDEX_HTML: `index.html`,
@@ -18,7 +19,9 @@ const names = {
 	TYPINGS_D_TS: `typings.d.ts`,
 	BROWSERSLISTRC: `.browserslistrc`,
 	GITIGNORE: `.gitignore`,
-	ASSETS: `assets`
+	ASSETS: `assets`,
+	HOME_PAGE_TS: `home-element.ts`,
+	HOME_PAGE_SCSS: `home-element.scss`
 };
 
 interface INewCommandConfig {
@@ -27,13 +30,26 @@ interface INewCommandConfig {
 	dir: string;
 	overwrite: boolean;
 	dry: boolean;
+	lit: boolean;
+}
+
+/**
+ * Install dependencies.
+ * @param deps
+ * @param development
+ * @param dir
+ */
+async function install (deps: string[], {development = false, dir = ""}: Partial<{development: boolean, dir: string}>) {
+	await run(`cd ${resolve(process.cwd(), dir)} && npm i ${deps.join(" ")} ${development ? `-D` : ""}`);
 }
 
 /**
  * Asks the user for input and returns a configuration object for the command.
  * @param dir
+ * @param dry
+ * @param lit
  */
-async function getNewCommandConfig ({dir, dry}: {dir: string, dry: boolean}): Promise<INewCommandConfig> {
+async function getNewCommandConfig ({dir, dry, lit}: {dir: string, dry: boolean, lit: boolean}): Promise<INewCommandConfig> {
 	const input = await prompts([
 		{
 			type: "text",
@@ -59,7 +75,7 @@ async function getNewCommandConfig ({dir, dry}: {dir: string, dry: boolean}): Pr
 		}
 	});
 
-	return {...input, dir, dry};
+	return {...input, dir, dry, lit};
 }
 
 /**
@@ -105,9 +121,11 @@ function run (cmd: string): Promise<void> {
 
 /**
  * Install dependencies.
- * @param config
+ * @param dry
+ * @param lit
+ * @param dir
  */
-async function installDependencies (config: INewCommandConfig) {
+async function installDependencies ({dry, lit, dir}: INewCommandConfig) {
 	const spinner = ora(green(`︎Installing dependencies...`)).start();
 
 	function finish () {
@@ -115,18 +133,28 @@ async function installDependencies (config: INewCommandConfig) {
 	}
 
 	// Check if the command is dry
-	if (config.dry) {
+	if (dry) {
 		finish();
 		return;
 	}
 
 	// Run the command
 	try {
-		await run(`cd ${resolve(process.cwd(), config.dir)} && npm i @appnest/web-config -D`);
+		await install(["@appnest/web-config"], {dir, development: true});
+
+		// Install lit related dependencies
+		if (lit) {
+			await install([
+				"@appnest/web-router",
+				"lit-element",
+				"weightless"
+			], {dir});
+		}
+
 		finish();
 
 	} catch (err) {
-		spinner.warn(`Could not install dependencies: ${err.message}`)
+		spinner.warn(`Could not install dependencies: ${err.message}`);
 	}
 }
 
@@ -389,31 +417,87 @@ ehthumbs.db
  */
 function setupBaseFiles (config: INewCommandConfig) {
 
-	const mainScssContent = `html { font-size: 12px; }`;
-	const mainTsContent = `import "main.scss";
-document.addEventListener("click", () => alert("Hello World!"));`;
+	// SASS
+	const mainScssContent = `html { font-size: 14px; }`;
+
+	// Index
 	const indexContent = `<!DOCTYPE html>
 <html>
 <head>
+	<base href="/">
 	<meta charset="UTF-8">
 	<title>@appnest/web-config</title>
 </head>
 <body>
 	<p>Hello World!</p>
+	${config.lit ? `<router-slot></router-slot>` : ""}
 </body>
 </html>`;
 
 	mkdirpSync(join(resolve(process.cwd(), config.dir), join(config.src, names.ASSETS)));
-	writeFile(join(config.src, names.MAIN_TS), mainTsContent, config);
 	writeFile(join(config.src, names.MAIN_SCSS), mainScssContent, config);
 	writeFile(join(config.src, names.INDEX_HTML), indexContent, config);
+
+	// Write the lit specific files or the default ones
+	if (config.lit) {
+		const mainContent = `import "main.scss";
+import "@appnest/web-router";
+import {RouterSlot} from "@appnest/web-router";
+
+customElements.whenDefined("router-slot").then(async () => {
+	const routerSlot = document.querySelector<RouterSlot>("router-slot")!;
+	await routerSlot.add([
+		{
+			path: "home",
+			component: () => import("./${LIT_HOME_PAGE_FOLDER_NAME}/home-element")
+	    },
+	    {
+			path: "**",
+			redirectTo: "home"
+	    }
+	]);
+});`;
+
+		const homePageTsContent = `import { customElement, html, LitElement, unsafeCSS } from "lit-element";
+import css from "./home-element.scss";
+import "weightless/button";
+
+@customElement("home-element")
+export default class HomeElement extends LitElement {
+	static styles = [unsafeCSS(css)];
+
+	render () {
+		return html\`
+			<wl-button>Welcome</wl-button>	
+		\`;
+	}
+}
+
+declare global {
+	interface HTMLElementTagNameMap {
+		"home-element": HomeElement;
+	}
+}`;
+
+		const homePageScssContent = `:host {
+	color: red;
+}`;
+
+		writeFile(join(config.src, names.MAIN_TS), mainContent, config);
+		writeFile(join(config.src, LIT_HOME_PAGE_FOLDER_NAME, names.HOME_PAGE_TS), homePageTsContent, config);
+		writeFile(join(config.src, LIT_HOME_PAGE_FOLDER_NAME, names.HOME_PAGE_SCSS), homePageScssContent, config);
+
+	} else {
+		const mainContent = `import "main.scss";`;
+		writeFile(join(config.src, names.MAIN_TS), mainContent, config);
+	}
 }
 
 /**
  * Executes the new command.
  * @param options
  */
-export async function newCommand (options: {dir: string, dry: boolean}) {
+export async function newCommand (options: {dir: string, dry: boolean, lit: boolean}) {
 	const config = await getNewCommandConfig(options);
 	setupRollup(config);
 	setupTslint(config);
@@ -429,5 +513,5 @@ export async function newCommand (options: {dir: string, dry: boolean}) {
 	console.log(`What's next?
   → Run "${green("npm run s")}" to serve your project.
   → Run "${green("npm run b:dev")}" to build your project for development.
-  → RUn "${green("npm run b:prod")}" to build your project for production.`)
+  → RUn "${green("npm run b:prod")}" to build your project for production.`);
 }

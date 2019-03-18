@@ -9,8 +9,9 @@ program
 	.command("new <dir>")
 	.description("Setup a new project from scratch.")
 	.option(`-d, --dry`, `Runs the command without writing any files.`)
+	.option(`-l, --lit`, `Adds lit-element and various webapp related libraries to the setup.`)
 	.action((dir, cmd) => {
-		newCommand({dir, dry: cmd.dry}).then();
+		newCommand({dir, dry: cmd.dry, lit: cmd.lit}).then();
 	});
 
 // Do some error handling
