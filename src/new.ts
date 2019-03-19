@@ -341,10 +341,10 @@ This project was built using the [create-web-config](https://github.com/andreasb
 	
 ## Usage 
 
-→ Run "npm run s" to serve your project.
-→ Run "npm run b:dev" to build your project for development.
-→ Run "npm run b:prod" to build your project for production.
-→ Run "npm run test" to test the application.`;
+* Run \`npm run s\` to serve your project.
+* Run \`npm run b:dev\` to build your project for development.
+* Run \`npm run b:prod\` to build your project for production.
+* Run \`npm run test\` to test the application.`;
 
 	const robotsTxtContent = `User-agent: *
 Allow: /`;
