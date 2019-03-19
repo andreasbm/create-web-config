@@ -62,7 +62,7 @@ Below are two examples on how to use the command. The commands will both create 
 
 ```
 $ npm init web-config new my-project
-$ npm init web-config new my-project -lit
+$ npm init web-config new my-project --lit
 ```
 
 
