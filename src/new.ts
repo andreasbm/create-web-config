@@ -45,7 +45,7 @@ async function getNewCommandConfig (options: INewCommandOptions): Promise<INewCo
 }
 
 /**
- * Setup rollup.config.js
+ * Setup rollup.config.ts
  * @param config
  */
 function setupRollup (config: INewCommandConfig) {
@@ -139,7 +139,7 @@ export default {
 	context: "window"
 }`;
 
-	writeFile(names.ROLLUP_CONFIG_JS, content, config);
+	writeFile(names.ROLLUP_CONFIG_TS, content, config);
 }
 
 /**
@@ -204,10 +204,10 @@ function setupScripts (config: INewCommandConfig) {
 	const content = `{
 	${dir != "" ? `"name": "${dir}",` : ""}
 	"scripts": {
-		"b:dev": "rollup -c --environment NODE_ENV:dev",
-		"b:prod": "rollup -c --environment NODE_ENV:prod",
-		"s:dev": "rollup -c --watch --environment NODE_ENV:dev",
-		"s:prod": "rollup -c --watch --environment NODE_ENV:prod",
+		"b:dev": "rollup -c rollup.config.ts --environment NODE_ENV:dev",
+		"b:prod": "rollup -c rollup.config.ts --environment NODE_ENV:prod",
+		"s:dev": "rollup -c rollup.config.ts --watch --environment NODE_ENV:dev",
+		"s:prod": "rollup -c rollup.config.ts --watch --environment NODE_ENV:prod",
 		"s": "npm run s:dev",
 		"test": "karma start karma.conf.js"
 	}

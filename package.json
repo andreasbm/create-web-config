@@ -35,13 +35,14 @@
 		"tsconfig"
 	],
 	"scripts": {
-		"b": "rollup -c && npm run postbuild",
+		"b": "rollup -c rollup.config.ts && npm run postbuild",
 		"readme": "readme generate",
 		"postbuild": "node post-build.js",
 		"postversion": "npm run readme && npm run b",
 		"publish:patch": "np patch --contents=dist",
 		"publish:minor": "np minor --contents=dist",
-		"publish:major": "np major --contents=dist"
+		"publish:major": "np major --contents=dist",
+		"ncu": "ncu -u -a && npm update && npm install"
 	},
 	"bin": {
 		"create-web-config": "index.cjs.js",
@@ -56,12 +57,12 @@
 		"prompts": "^2.0.4"
 	},
 	"devDependencies": {
-		"@appnest/readme": "^1.2.1",
+		"@appnest/readme": "^1.2.3",
 		"@types/fs-extra": "^5.0.5",
 		"@types/prompts": "^1.2.0",
-		"@wessberg/rollup-plugin-ts": "^1.1.35",
+		"@wessberg/rollup-plugin-ts": "^1.1.40",
 		"rollup-plugin-commonjs": "^9.2.1",
-		"rollup-plugin-json": "^3.1.0",
+		"rollup-plugin-json": "^4.0.0",
 		"rollup-plugin-node-resolve": "^4.0.1"
 	},
 	"contributors": [

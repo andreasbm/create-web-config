@@ -46,11 +46,11 @@ Usage: new [options] <dir>
 Setup a new project from scratch.
 
 Options:
-  -d, --dry     Runs the command without writing any files.
-  -l, --lit     Adds lit-element and various webapp related libraries to the setup.
-  --no-install  Doesn't install node_modules.
-  --sw          Adds a service worker to the setup.
-  -h, --help    output usage information
+  -d, --dry          Runs the command without writing any files.
+  -l, --lit          Adds lit-element and various webapp related libraries to the setup.
+  -ni, --no-install  Doesn't install node_modules.
+  -sw, --sw          Adds a service worker to the setup.
+  -h, --help         output usage information
 ```
 
 
@@ -80,7 +80,7 @@ Here's an overview of the files that are generated for you.
 | `karma.conf.js`                  | Configuration for the testing setup with karma.  |
 | `package.json`                   | Specifies dependencies and other information about your project. |
 | `README.md`                      | Gives an introduction to your project.           |
-| `rollup.config.js`               | Rollup configuration for the build steps.        |
+| `rollup.config.ts`               | Rollup configuration for the build steps.        |
 | `tsconfig.json`                  | Configuration for Typescript.                    |
 | `tslint.json`                    | Configuration for how your files should be linted. |
 | `typings.d.ts`                   | Additional typings for Typescript.               |

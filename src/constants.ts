@@ -4,7 +4,7 @@ export const names = {
 	MAIN_TS: `main.ts`,
 	INDEX_HTML: `index.html`,
 	MAIN_SCSS: `main.scss`,
-	ROLLUP_CONFIG_JS: `rollup.config.js`,
+	ROLLUP_CONFIG_TS: `rollup.config.ts`,
 	TS_LINT_JSON: `tslint.json`,
 	TS_CONFIG_JSON: `tsconfig.json`,
 	KARMA_CONFIG_JS: `karma.conf.js`,
