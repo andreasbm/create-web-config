@@ -8,10 +8,10 @@ program
 program
 	.command("new <dir>")
 	.description("Setup a new project from scratch.")
-	.option(`-d, --dry`, `Runs the command without writing any files.`)
-	.option(`-l, --lit`, `Adds lit-element and various webapp related libraries to the setup.`)
-	.option(`-n, --no-install`, `Doesn't install node_modules.`)
-	.option(`-s, --sw`, `Adds a service worker to the setup.`)
+	.option(`--dry`, `Runs the command without writing any files.`)
+	.option(`--lit`, `Adds lit-element and various webapp related libraries to the setup.`)
+	.option(`--no-install`, `Doesn't install node_modules.`)
+	.option(`--sw`, `Adds a service worker to the setup.`)
 	.action((dir, cmd) => {
 		const {dry, lit, install, sw} = cmd;
 		newCommand({dir, dry, lit, install, sw}).then();

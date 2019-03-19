@@ -39,9 +39,9 @@
 		"readme": "readme generate",
 		"postbuild": "node post-build.js",
 		"postversion": "npm run readme && npm run b",
-		"publish:patch": "np patch --contents=dist",
-		"publish:minor": "np minor --contents=dist",
-		"publish:major": "np major --contents=dist",
+		"publish:patch": "np patch --contents=dist --no-cleanup",
+		"publish:minor": "np minor --contents=dist --no-cleanup",
+		"publish:major": "np major --contents=dist --no-cleanup",
 		"ncu": "ncu -u -a && npm update && npm install"
 	},
 	"bin": {
