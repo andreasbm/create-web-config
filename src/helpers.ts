@@ -54,7 +54,7 @@ export function createDirectory (dir: string, config: INewCommandConfig) {
 		return;
 	}
 
-	const path = resolve(process.cwd(), dir);
+	const path = resolve(process.cwd(), join(config.dir, dir));
 	mkdirpSync(path);
 }
 

@@ -29,7 +29,7 @@ To create a new app you run the following command.
 $ npm init web-config new <dir>
 ```
 
-This command will create a project from scratch for you with with sweet features as for example SCSS imports, Karma testing, live reloading, coping resources, chunking, treeshaking, Typescript, license extraction, filesize visualizer, JSON import, budgets, build progress, minifying, compression with brotli and gzip and much more.
+This command will create a project from scratch for you with sweet features as for example SCSS imports, Karma testing, live reloading, coping resources, chunking, treeshaking, Typescript, license extraction, filesize visualizer, JSON import, budgets, build progress, minifying, compression with brotli and gzip and much more.
 
 That's it! Behind the curtains, the library [web-config](https://github.com/andreasbm/web-config) is used.
 
@@ -46,9 +46,11 @@ Usage: new [options] <dir>
 Setup a new project from scratch.
 
 Options:
-  -d, --dry   Runs the command without writing any files.
-  -l, --lit   Adds lit-element and various webapp related libraries to the setup.
-  -h, --help  output usage information
+  -d, --dry     Runs the command without writing any files.
+  -l, --lit     Adds lit-element and various webapp related libraries to the setup.
+  --no-install  Doesn't install node_modules.
+  --sw          Adds a service worker to the setup.
+  -h, --help    output usage information
 ```
 
 
@@ -62,6 +64,44 @@ Below are two examples on how to use the command. The commands will both create 
 $ npm init web-config new my-project
 $ npm init web-config new my-project -lit
 ```
+
+
+[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#overview)
+
+## ➤ Overview
+
+Here's an overview of the files that are generated for you.
+
+
+| File                             | Description                                      |
+|----------------------------------|--------------------------------------------------|
+| `.browserslistrc`                | Specifies which browsers are supported by your build. |
+| `.gitignore`                     | Files ignored when adding files to git.          |
+| `karma.conf.js`                  | Configuration for the testing setup with karma.  |
+| `package.json`                   | Specifies dependencies and other information about your project. |
+| `README.md`                      | Gives an introduction to your project.           |
+| `rollup.config.js`               | Rollup configuration for the build steps.        |
+| `tsconfig.json`                  | Configuration for Typescript.                    |
+| `tslint.json`                    | Configuration for how your files should be linted. |
+| `typings.d.ts`                   | Additional typings for Typescript.               |
+| `src/index.html`                 | Entry HTML for your webapp.                      |
+| `src/main.ts`                    | Entry JS for your webapp.                        |
+| `src/main.scss`                  | Styles loaded and appended to the document.      |
+| `src/robots.txt`                 | Specifies how crawlers should handle your site.  |
+| `src/assets/manifest.json`       | Web manifest.                                    |
+| `src/pages/home-element.ts`      | Element for the home page.                       |
+| `src/pages/home-element.scss`    | SCSS for the home element.                       |
+| `src/pages/home-element.test.ts` | Tests for the home element.                      |
+
+
+
+[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#100100-lighthouse-score)
+
+## ➤ 100/100 Lighthouse score
+
+If you add a service worker by running the `$ npm init web-config new my-project --sw` command you'll get to enjoy a 100/100 Lighthouse score from the beginning.
+
+<img src="https://raw.githubusercontent.com/andreasbm/create-web-config/master/lighthouse.png" width="500">
 
 
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#local-installation)

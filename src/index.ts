@@ -10,8 +10,11 @@ program
 	.description("Setup a new project from scratch.")
 	.option(`-d, --dry`, `Runs the command without writing any files.`)
 	.option(`-l, --lit`, `Adds lit-element and various webapp related libraries to the setup.`)
+	.option(`--no-install`, `Doesn't install node_modules.`)
+	.option(`--sw`, `Adds a service worker to the setup.`)
 	.action((dir, cmd) => {
-		newCommand({dir, dry: cmd.dry, lit: cmd.lit}).then();
+		const {dry, lit, install, sw} = cmd;
+		newCommand({dir, dry, lit, install, sw}).then();
 	});
 
 // Do some error handling

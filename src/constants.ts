@@ -13,7 +13,11 @@ export const names = {
 	BROWSERSLISTRC: `.browserslistrc`,
 	GITIGNORE: `.gitignore`,
 	ASSETS: `assets`,
+	MANIFEST_JSON: `manifest.json`,
+	ROBOTS_TXT: `robots.txt`,
 	HOME_ELEMENT_TS: `home-element.ts`,
 	HOME_ELEMENT_TEST_TS: `home-element.test.ts`,
-	HOME_ELEMENT_SCSS: `home-element.scss`
+	HOME_ELEMENT_SCSS: `home-element.scss`,
+	README_MD: `README.md`,
+	SERVICE_WORKER_JS: "sw.js"
 };

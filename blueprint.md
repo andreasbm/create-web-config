@@ -14,7 +14,7 @@ To create a new app you run the following command.
 $ npm init web-config new <dir>
 ```
 
-This command will create a project from scratch for you with with sweet features as for example SCSS imports, Karma testing, live reloading, coping resources, chunking, treeshaking, Typescript, license extraction, filesize visualizer, JSON import, budgets, build progress, minifying, compression with brotli and gzip and much more.
+This command will create a project from scratch for you with sweet features as for example SCSS imports, Karma testing, live reloading, coping resources, chunking, treeshaking, Typescript, license extraction, filesize visualizer, JSON import, budgets, build progress, minifying, compression with brotli and gzip and much more.
 
 That's it! Behind the curtains, the library [web-config](https://github.com/andreasbm/web-config) is used.
 
@@ -28,9 +28,11 @@ Usage: new [options] <dir>
 Setup a new project from scratch.
 
 Options:
-  -d, --dry   Runs the command without writing any files.
-  -l, --lit   Adds lit-element and various webapp related libraries to the setup.
-  -h, --help  output usage information
+  -d, --dry     Runs the command without writing any files.
+  -l, --lit     Adds lit-element and various webapp related libraries to the setup.
+  --no-install  Doesn't install node_modules.
+  --sw          Adds a service worker to the setup.
+  -h, --help    output usage information
 ```
 
 ## Example
@@ -41,6 +43,18 @@ Below are two examples on how to use the command. The commands will both create 
 $ npm init web-config new my-project
 $ npm init web-config new my-project -lit
 ```
+
+## Overview
+
+Here's an overview of the files that are generated for you.
+
+{{ files }}
+
+## 100/100 Lighthouse score
+
+If you add a service worker by running the `$ npm init web-config new my-project --sw` command you'll get to enjoy a 100/100 Lighthouse score from the beginning.
+
+<img src="https://raw.githubusercontent.com/andreasbm/create-web-config/master/lighthouse.png" width="500">
 
 ## Local installation
 

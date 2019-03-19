@@ -1,8 +1,13 @@
-export interface INewCommandConfig {
-	dist: string;
-	src: string;
+export interface INewCommandOptions {
 	dir: string;
-	overwrite: boolean;
 	dry: boolean;
 	lit: boolean;
+	install: boolean;
+	sw: boolean;
+}
+
+export interface INewCommandConfig extends INewCommandOptions {
+	dist: string;
+	src: string;
+	overwrite: boolean;
 }

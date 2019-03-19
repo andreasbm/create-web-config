@@ -2,5 +2,25 @@
 	"ids": {
 		"npm": "create-web-config",
 		"github": "andreasbm/create-web-config"
-	}
+	},
+	"files": [
+		["File", "Description"],
+		["`.browserslistrc`", "Specifies which browsers are supported by your build."],
+		["`.gitignore`", "Files ignored when adding files to git."],
+		["`karma.conf.js`", "Configuration for the testing setup with karma."],
+		["`package.json`", "Specifies dependencies and other information about your project."],
+		["`README.md`", "Gives an introduction to your project."],
+		["`rollup.config.js`", "Rollup configuration for the build steps."],
+		["`tsconfig.json`", "Configuration for Typescript."],
+		["`tslint.json`", "Configuration for how your files should be linted."],
+		["`typings.d.ts`", "Additional typings for Typescript."],
+		["`src/index.html`", "Entry HTML for your webapp."],
+		["`src/main.ts`", "Entry JS for your webapp."],
+		["`src/main.scss`", "Styles loaded and appended to the document."],
+		["`src/robots.txt`", "Specifies how crawlers should handle your site."],
+		["`src/assets/manifest.json`", "Web manifest."],
+		["`src/pages/home-element.ts`", "Element for the home page."],
+		["`src/pages/home-element.scss`", "SCSS for the home element."],
+		["`src/pages/home-element.test.ts`", "Tests for the home element."]
+	]
 }

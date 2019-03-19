@@ -4,15 +4,14 @@ import { join, resolve } from "path";
 import prompts from "prompts";
 import { LIT_HOME_PAGE_FOLDER_NAME, names, NPM_ID } from "./constants";
 import { createDirectory, installDependencies, writeFile } from "./helpers";
-import { INewCommandConfig } from "./model";
+import { INewCommandConfig, INewCommandOptions } from "./model";
 
 /**
  * Asks the user for input and returns a configuration object for the command.
- * @param dir
- * @param dry
- * @param lit
+ * @param options
  */
-async function getNewCommandConfig ({dir, dry, lit}: {dir: string, dry: boolean, lit: boolean}): Promise<INewCommandConfig> {
+async function getNewCommandConfig (options: INewCommandOptions): Promise<INewCommandConfig> {
+	const {dir} = options;
 	const input = await prompts<"src" | "dist" | "overwrite">([
 		{
 			type: "text",
@@ -42,7 +41,7 @@ async function getNewCommandConfig ({dir, dry, lit}: {dir: string, dry: boolean,
 		}
 	});
 
-	return {overwrite: true, ...input, dir, dry, lit};
+	return {overwrite: true, ...input, ...options};
 }
 
 /**
@@ -50,6 +49,7 @@ async function getNewCommandConfig ({dir, dry, lit}: {dir: string, dry: boolean,
  * @param config
  */
 function setupRollup (config: INewCommandConfig) {
+	const {lit, sw} = config;
 	const content = `import {resolve, join} from "path";
 import {
 	defaultOutputConfig,
@@ -57,7 +57,8 @@ import {
 	defaultProdPlugins,
 	defaultServePlugins,
 	isProd,
-	isServe
+	isServe${sw ? `,
+	workbox` : ""}
 } from "${NPM_ID}";
 
 const folders = {
@@ -70,7 +71,10 @@ const folders = {
 const files = {
 	main: join(folders.src, "${names.MAIN_TS}"),
 	src_index: join(folders.src, "${names.INDEX_HTML}"),
-	dist_index: join(folders.dist, "${names.INDEX_HTML}")
+	src_robots: join(folders.src, "${names.ROBOTS_TXT}"),
+	dist_index: join(folders.dist, "${names.INDEX_HTML}"),
+	dist_robots: join(folders.dist, "${names.ROBOTS_TXT}")${sw ? `,
+	dist_service_worker: join(folders.dist, "${names.SERVICE_WORKER_JS}")` : ""}
 };
 
 export default {
@@ -91,9 +95,15 @@ export default {
 				]
 			},
 			copyConfig: {
-				resources: [[folders.src_assets, folders.dist_assets]]
+				resources: [
+					[files.src_robots, files.dist_robots],
+					[folders.src_assets, folders.dist_assets]
+				]
 			},
 			htmlTemplateConfig: {
+				${lit ? `polyfillConfig: {
+					features: ["es", "template", "shadow-dom", "custom-elements"]
+				},` : ""}
 				template: files.src_index,
 				target: files.dist_index,
 				include: /main(-.*)?\\.js$/
@@ -114,9 +124,16 @@ export default {
 		...(isProd ? [
 			...defaultProdPlugins({
 				dist: folders.dist
-			})
-		] : [])
-
+			}),
+		] : [])${sw ? `,
+		workbox({
+			mode: "generateSW",
+			workboxConfig: {
+				globDirectory: folders.dist,
+				swDest: files.dist_service_worker,
+				globPatterns: [ \`**/*.{js,png,html,css}\`]
+			}
+		})` : ""}
 	],
 	treeshake: isProd,
 	context: "window"
@@ -304,28 +321,84 @@ ehthumbs.db
  * Setup base files.
  */
 function setupBaseFiles (config: INewCommandConfig) {
-	const {dir, lit, src} = config;
+	const {dir, lit, src, sw} = config;
+
+	const registerSwContent = `
+
+// Register the service worker
+if ("serviceWorker" in navigator) {
+	navigator.serviceWorker.register("/${names.SERVICE_WORKER_JS}").then(res => {
+		console.log(\`Service worker registered\`, res);
+	});
+}`;
 
 	// SASS
 	const mainScssContent = `html { font-size: 14px; }`;
 
+	const readmeMdContent = `# ${dir}
+	
+This project was built using the [create-web-config](https://github.com/andreasbm/create-web-config) CLI.
+	
+## Usage 
+
+→ Run "npm run s" to serve your project.
+→ Run "npm run b:dev" to build your project for development.
+→ Run "npm run b:prod" to build your project for production.
+→ Run "npm run test" to test the application.`;
+
+	const robotsTxtContent = `User-agent: *
+Allow: /`;
+
 	// Index
 	const indexContent = `<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 	<base href="/">
-	<meta charset="UTF-8">
 	<title>${dir}</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="theme-color" content="#ffffff">
+	<meta name="description" content="This project was generated using the 'npm init web-config' command">
+	<link rel="manifest" href="/assets/manifest.json">
 </head>
 <body>
 	<p>${dir}</p>
 	${lit ? `<router-slot></router-slot>` : ""}
+	
+	<noscript>
+		<p>Please enable Javascript in your browser.</p>
+	</noscript>
 </body>
 </html>`;
 
-	createDirectory(join(config.dir, src, names.ASSETS), config);
+	const manifestJsonContent = `{
+    "name": "${dir}",
+    "short_name": "${dir}",
+    "theme_color": "#ffffff",
+    "background_color": "#ffffff",
+    "display": "standalone",
+    "start_url": "/",
+    "lang": "en-US",
+    "icons": [
+        {
+            "src": "https://raw.githubusercontent.com/andreasbm/weightless/master/assets/www/android-chrome-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "https://raw.githubusercontent.com/andreasbm/weightless/master/assets/www/android-chrome-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}`;
+
+	createDirectory(join(src, names.ASSETS), config);
+	writeFile(join(src, names.ASSETS, names.MANIFEST_JSON), manifestJsonContent, config);
 	writeFile(join(src, names.MAIN_SCSS), mainScssContent, config);
 	writeFile(join(src, names.INDEX_HTML), indexContent, config);
+	writeFile(join(src, names.ROBOTS_TXT), robotsTxtContent, config);
+	writeFile(names.README_MD, readmeMdContent, config);
 
 	// Write the lit specific files or the default ones
 	if (lit) {
@@ -345,7 +418,7 @@ customElements.whenDefined("router-slot").then(async () => {
 			redirectTo: "home"
 	    }
 	]);
-});`;
+});${sw ? registerSwContent : ""}`;
 
 		const homeElementTsContent = `import { customElement, html, LitElement, unsafeCSS } from "lit-element";
 import css from "./home-element.scss";
@@ -403,7 +476,7 @@ describe("home-element", () => {
 		writeFile(join(src, LIT_HOME_PAGE_FOLDER_NAME, names.HOME_ELEMENT_TEST_TS), homeElementTsTestContent, config);
 
 	} else {
-		const mainTsContent = `import "main.scss";`;
+		const mainTsContent = `import "main.scss";${sw ? registerSwContent : ""}`;
 		writeFile(join(src, names.MAIN_TS), mainTsContent, config);
 	}
 }
@@ -412,7 +485,8 @@ describe("home-element", () => {
  * Executes the new command.
  * @param options
  */
-export async function newCommand (options: {dir: string, dry: boolean, lit: boolean}) {
+export async function newCommand (options: INewCommandOptions) {
+	const {dir, install} = options;
 	const config = await getNewCommandConfig(options);
 	setupRollup(config);
 	setupTslint(config);
@@ -423,10 +497,16 @@ export async function newCommand (options: {dir: string, dry: boolean, lit: bool
 	setupTypings(config);
 	setupGitIgnore(config);
 	setupBaseFiles(config);
-	await installDependencies(config);
-	console.log(green(`✔ Finished creating project in "${resolve(process.cwd(), options.dir)}" 🎉`));
+
+	// Only install if specified
+	if (install) {
+		await installDependencies(config);
+	}
+
+	// Tell the user that everything worked!
+	console.log(green(`✔ Finished creating project in "${resolve(process.cwd(), dir)}" 🎉`));
 	console.log(`What's next?
   → Run "${green("npm run s")}" to serve your project.
   → Run "${green("npm run b:dev")}" to build your project for development.
-  → RUn "${green("npm run b:prod")}" to build your project for production.`);
+  → Run "${green("npm run b:prod")}" to build your project for production.`);
 }
