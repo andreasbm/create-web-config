@@ -80,7 +80,7 @@ Here's an overview of the files that are generated for you.
 | `karma.conf.js`                  | Configuration for the testing setup with karma.  |
 | `package.json`                   | Specifies dependencies and other information about your project. |
 | `README.md`                      | Gives an introduction to your project.           |
-| `rollup.config.ts`               | Rollup configuration for the build steps.        |
+| `rollup.config.ts`               | Rollup configuration for the build.              |
 | `tsconfig.json`                  | Configuration for Typescript.                    |
 | `tslint.json`                    | Configuration for how your files should be linted. |
 | `typings.d.ts`                   | Additional typings for Typescript.               |
