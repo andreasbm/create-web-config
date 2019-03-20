@@ -1,5 +1,7 @@
 export const NPM_ID = `@appnest/web-config`;
 export const LIT_HOME_PAGE_FOLDER_NAME = `pages/home`;
+export const DIST_FOLDER_NAME = `dist`;
+export const SRC_FOLDER_NAME = `src`;
 export const names = {
 	MAIN_TS: `main.ts`,
 	INDEX_HTML: `index.html`,

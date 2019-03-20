@@ -29,36 +29,24 @@ import { INewCommandConfig, INewCommandOptions } from "./model";
  */
 async function getNewCommandConfig (options: INewCommandOptions): Promise<INewCommandConfig> {
 	const {dir} = options;
-	const input = await prompts<"src" | "dist" | "overwrite">([
-		{
-			type: "text",
-			name: "src",
-			message: `What should we call the folder with your source code?`,
-			initial: `src`
-		},
-		{
-			type: "text",
-			name: "dist",
-			message: `What should we call the folder with the transpiled output?`,
-			initial: `dist`
-		},
 
-		// Ugly cast warning, but the prompts library have some funky race condition bugs going on
-		// if we want to ask for two different rounds of user input in a row.
-		...(existsSync(resolve(process.cwd(), dir)) ? [{
+	let overwrite = true;
+	if (existsSync(resolve(process.cwd(), dir))) {
+		const input = await prompts<"overwrite">({
 			type: "confirm",
 			name: "overwrite",
 			message: `The directory "${dir}" already exists. Do you want to overwrite existing files?`,
 			initial: true
-		}] : [] as any)
+		}, {
+			onCancel: () => {
+				process.exit(1);
+			}
+		});
 
-	], {
-		onCancel: () => {
-			process.exit(1);
-		}
-	});
+		overwrite = input.overwrite;
+	}
 
-	return {overwrite: true, ...input, ...options};
+	return {overwrite, ...options};
 }
 
 /**

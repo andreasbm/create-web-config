@@ -28,11 +28,13 @@ Usage: new [options] <dir>
 Setup a new project from scratch.
 
 Options:
-  --dry         Runs the command without writing any files.
-  --lit         Adds lit-element and various webapp related libraries to the setup.
-  --no-install  Doesn't install node_modules.
-  --sw          Adds a service worker to the setup.
-  -h, --help    output usage information
+  --dry            Runs the command without writing any files.
+  --lit            Adds lit-element and various webapp related libraries to the setup.
+  --no-install     Doesn't install node_modules.
+  --sw             Adds a service worker to the setup.
+  --src <string>   Name of the folder with the transpiled output (default: "src")
+  --dist <string>  Name of the folder with the source code (default: "dist")
+  -h, --help       output usage information
 ```
 
 ## Example

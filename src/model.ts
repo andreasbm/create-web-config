@@ -4,10 +4,10 @@ export interface INewCommandOptions {
 	lit: boolean;
 	install: boolean;
 	sw: boolean;
+	dist: string;
+	src: string;
 }
 
 export interface INewCommandConfig extends INewCommandOptions {
-	dist: string;
-	src: string;
 	overwrite: boolean;
 }

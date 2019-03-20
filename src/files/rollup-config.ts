@@ -65,18 +65,22 @@ export default {
 		}),
 
 		// Serve
-		...(isServe ? [
-			...defaultServePlugins({
-				dist: folders.dist
-			})
-		] : []),
+		...(isServe ? defaultServePlugins({
+			dist: folders.dist
+		}) : []),
 
 		// Production
-		...(isProd ? [
-			...defaultProdPlugins({
-				dist: folders.dist
-			}),
-		] : [])${sw ? `,
+		...(isProd ? defaultProdPlugins({
+			dist: folders.dist,
+			budgetConfig: {
+				sizes: {
+					".js": 1024 * 170,
+					".jpg": 1024 * 400
+				}
+			}
+		}) : [])${sw ? `,
+		
+		// Service worker
 		workbox({
 			mode: "generateSW",
 			workboxConfig: {

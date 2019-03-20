@@ -1,5 +1,6 @@
 import * as program from "commander";
 import pkg from "./../package.json";
+import { DIST_FOLDER_NAME, SRC_FOLDER_NAME } from "./constants";
 import { newCommand } from "./new";
 
 program
@@ -12,9 +13,11 @@ program
 	.option(`--lit`, `Adds lit-element and various webapp related libraries to the setup.`)
 	.option(`--no-install`, `Doesn't install node_modules.`)
 	.option(`--sw`, `Adds a service worker to the setup.`)
+	.option(`--src <string>`, `Name of the folder with the transpiled output`, SRC_FOLDER_NAME)
+	.option(`--dist <string>`, `Name of the folder with the source code`, DIST_FOLDER_NAME)
 	.action((dir, cmd) => {
-		const {dry, lit, install, sw} = cmd;
-		newCommand({dir, dry, lit, install, sw}).then();
+		const {dry, lit, install, sw, src, dist} = cmd;
+		newCommand({dir, dry, lit, install, sw, src, dist}).then();
 	});
 
 // Do some error handling
