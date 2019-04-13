@@ -7,10 +7,6 @@ import resolve from 'rollup-plugin-node-resolve';
 export const rollupBuildConfig = {
 	plugins: [
 		resolve({
-			module: true,
-			browser: true,
-			jsnext: true,
-			main: false,
 			modulesOnly: false
 		}),
 		json(),
