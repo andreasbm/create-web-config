@@ -84,7 +84,8 @@ Here's an overview of the files that are generated for you.
 | `README.md`                      | Gives an introduction to your project.           |
 | `rollup.config.ts`               | Rollup configuration for the build.              |
 | `tsconfig.json`                  | Configuration for Typescript.                    |
-| `tslint.json`                    | Configuration for how your files should be linted. |
+| `.eslintrc.json`                 | Configuration for how your files should be linted. |
+| `.eslintignore`                  | Configuration for which files should be ignored by the linter. |
 | `typings.d.ts`                   | Additional typings for Typescript.               |
 | `src/index.html`                 | Entry HTML for your webapp.                      |
 | `src/main.ts`                    | Entry JS for your webapp.                        |

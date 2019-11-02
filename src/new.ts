@@ -4,6 +4,7 @@ import { join, resolve } from "path";
 import prompts from "prompts";
 import { LIT_HOME_PAGE_FOLDER_NAME, names } from "./constants";
 import { browsersListTemplate } from "./files/browserslist";
+import { eslintIgnoreTemplate } from "./files/eslintignore";
 import { gitignoreTemplate } from "./files/gitignore";
 import { homeElementScssTemplate } from "./files/home-element-scss";
 import { homeElementTestTemplate } from "./files/home-element-test";
@@ -18,7 +19,7 @@ import { readmeTemplate } from "./files/readme";
 import { robotsTemplate } from "./files/robots";
 import { rollupConfigTemplate } from "./files/rollup-config";
 import { tsconfigTemplate } from "./files/tsconfig";
-import { tslintTemplate } from "./files/tslint";
+import { eslintTemplate } from "./files/eslint";
 import { typingsTemplate } from "./files/typings";
 import { createDirectory, installDependencies, writeFile } from "./helpers";
 import { INewCommandConfig, INewCommandOptions } from "./model";
@@ -62,9 +63,18 @@ function setupRollupConfig (config: INewCommandConfig) {
  * Setup tslint.json
  * @param config
  */
-function setupTslint (config: INewCommandConfig) {
-	const content = tslintTemplate(config);
-	writeFile(names.TS_LINT_JSON, content, config);
+function setupEslint (config: INewCommandConfig) {
+	const content = eslintTemplate(config);
+	writeFile(names.ES_LINT_JSON, content, config);
+}
+
+/**
+ * Setup .eslintignore
+ * @param config
+ */
+function setupEslintIgnore (config: INewCommandConfig) {
+	const content = eslintIgnoreTemplate(config);
+	writeFile(names.ES_LINT_IGNORE, content, config);
 }
 
 /**
@@ -160,7 +170,8 @@ export async function newCommand (options: INewCommandOptions) {
 	const {dir, install} = options;
 	const config = await getNewCommandConfig(options);
 	setupRollupConfig(config);
-	setupTslint(config);
+	setupEslint(config);
+	setupEslintIgnore(config);
 	setupTsconfig(config);
 	setupBrowserslist(config);
 	setupKarma(config);

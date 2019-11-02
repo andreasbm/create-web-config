@@ -4,7 +4,7 @@ import commonjs from 'rollup-plugin-commonjs';
 import json from 'rollup-plugin-json';
 import resolve from 'rollup-plugin-node-resolve';
 
-export const rollupBuildConfig = {
+const rollupBuildConfig = {
 	plugins: [
 		resolve({
 			modulesOnly: false
